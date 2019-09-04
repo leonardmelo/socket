@@ -24,24 +24,28 @@
         var mapWidth
         var mapHeight;
         var miniMapScale = 15;
+        var player;
 
-        socket.on("map", data => {
+        socket.on("map", data => {            
             this.map = data;
             this.mapHeight = data.length;
             this.mapWidth = data[0].length;
             this.drawMiniMap();
         });
+        socket.on("player", data=>{
+            this.player = data;
+        })
 
         document.onkeydown = function (e) {
             switch (e.keyCode) {
                 case 38:
-                    socket.emit("move", "left");; break;
+                    socket.emit("move", "down");; break;
                 case 40:
-                    socket.emit("move", "right"); break;
+                    socket.emit("move", "up"); break;
                 case 37:
-                    socket.emit("move", "down"); break;
+                    socket.emit("move", "left"); break;
                 case 39:
-                    socket.emit("move", "up");; break;
+                    socket.emit("move", "right");; break;
             }
 
 
@@ -65,15 +69,16 @@
                             this.miniMapScale, this.miniMapScale
                         );
                     }
-                    if (wall > 9) {
-                        ctx.fillStyle = 'rgb(255,50,50)';
-                        ctx.fillRect(
-                            x * this.miniMapScale,
-                            y * this.miniMapScale,
-                            this.miniMapScale, this.miniMapScale
-                        );
-                    }
                 }
+            }
+            if(this.player){
+                for(let element in this.player){
+                    ctx.fillStyle = 'rgb(255,50,50)';
+                    ctx.fillRect(
+                        this.player[element].posX * this.miniMapScale,
+                        this.player[element].posY * this.miniMapScale,
+                        this.miniMapScale, this.miniMapScale
+                    );           }
             }
         }
 

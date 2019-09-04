@@ -42,39 +42,36 @@ var map = [
 	[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
 	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ];
-var player = {
-    posX: 14,
-    posY: 6
-}
+
 var SOCKET_LIST = {};
+var PLAYERS_LIST = {};
 io.on('connection', socket =>{
-    SOCKET_LIST[socket.id] = socket;    
+	SOCKET_LIST[socket.id] = socket;
+	PLAYERS_LIST[socket.id] = {posX:14, posY:12}    
 
     socket.on("move", move=>{
         switch (move) {
                 
             case "up":
-                player.posY++; break;
+                PLAYERS_LIST[socket.id].posY++; break;
             
             case "down":
-                player.posY--; break;
+                PLAYERS_LIST[socket.id].posY--; break;
             
             case "left":
-                player.posX--; break;
+                PLAYERS_LIST[socket.id].posX--; break;
             
             case "right":
-                player.posX++; break;
+                PLAYERS_LIST[socket.id].posX++; break;
         }
-    });
+	});
+	
 })
 
-function updateMap(){
-    map[player.posX][player.posY] = 10;
-}
-
 setInterval(function(){
-    updateMap();
+    
     for(var i in SOCKET_LIST){
-        SOCKET_LIST[i].emit("map", map);
+		SOCKET_LIST[i].emit("map", map);
+		SOCKET_LIST[i].emit("player", PLAYERS_LIST);
     }
 },1000/30)
