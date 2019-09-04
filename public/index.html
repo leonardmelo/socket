@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Wolf Online</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
+        integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <div id="minimapcontainer">
+        <canvas id="minimap"></canvas>
+    </div>
+
+    <script>
+        var $ = (id) => document.getElementById(id);
+        var socket = io('http://localhost:3000');
+        var map;
+        var mapWidth
+        var mapHeight;
+        var miniMapScale = 15;
+
+        socket.on("map", data => {
+            this.map = data;
+            this.mapHeight = data.length;
+            this.mapWidth = data[0].length;
+            this.drawMiniMap();
+        });
+
+        document.onkeydown = function (e) {
+            switch (e.keyCode) {
+                case 38:
+                    socket.emit("move", "left");; break;
+                case 40:
+                    socket.emit("move", "right"); break;
+                case 37:
+                    socket.emit("move", "down"); break;
+                case 39:
+                    socket.emit("move", "up");; break;
+            }
+
+
+        }
+
+        function drawMiniMap() {
+            var miniMap = $('minimap');
+            miniMap.width = this.mapWidth * this.miniMapScale;
+            miniMap.height = this.mapHeight * this.miniMapScale;
+            miniMap.style.width = (this.mapWidth * this.miniMapScale) + 'px';
+            miniMap.style.height = (this.mapHeight * this.miniMapScale) + 'px';
+            var ctx = miniMap.getContext('2d');
+            for (var y = 0; y < this.mapHeight; y++) {
+                for (var x = 0; x < this.mapWidth; x++) {
+                    var wall = map[y][x];
+                    if (wall > 0) {
+                        ctx.fillStyle = 'rgb(200,200,200)';
+                        ctx.fillRect(
+                            x * this.miniMapScale,
+                            y * this.miniMapScale,
+                            this.miniMapScale, this.miniMapScale
+                        );
+                    }
+                    if (wall > 9) {
+                        ctx.fillStyle = 'rgb(255,50,50)';
+                        ctx.fillRect(
+                            x * this.miniMapScale,
+                            y * this.miniMapScale,
+                            this.miniMapScale, this.miniMapScale
+                        );
+                    }
+                }
+            }
+        }
+
+    </script>
+</body>
+
+</html>
